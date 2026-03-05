@@ -91,6 +91,23 @@ def send_telegram_alert(title, item_link, bulletin_url):
     except Exception as e:
         print(f"❌ Error al enviar mensaje por Telegram: {e}")
 
+def send_telegram_status(message_text):
+    """Envía un mensaje informativo (sin formato de oposición) a Telegram."""
+    if TELEGRAM_TOKEN == 'TU_TOKEN_TELEGRAM' or TELEGRAM_CHAT_ID == 'TU_CHAT_ID':
+        return
+
+    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+    payload = {
+        'chat_id': TELEGRAM_CHAT_ID,
+        'text': message_text,
+        'parse_mode': 'HTML',
+        'disable_web_page_preview': True
+    }
+    try:
+        requests.post(url, json=payload, timeout=10)
+    except Exception as e:
+        print(f"❌ Error al enviar estado por Telegram: {e}")
+
 def scrape_bocm():
     """Función principal que lee el BOCM y busca oposiciones."""
     bulletin_url = get_bocm_url()
@@ -117,6 +134,7 @@ def scrape_bocm():
                     continue
                 else:
                     print("⛔ Se agotaron los reintentos por hoy. Saliendo.")
+                    send_telegram_status(f"⚠️ <b>Aviso:</b> Tras {MAX_RETRIES} intentos, el BOCM de hoy no parece estar publicado aún. Finalizando ejecución por hoy.")
                     return
             
             # Lanzar error general de HTTP si lo hay y no es 200/404
@@ -174,6 +192,7 @@ def scrape_bocm():
 
     if nuevos_encontrados == 0:
         print("\nℹ️ No se encontraron nuevas disposiciones para el perfil 'A2 Gestión'.")
+        send_telegram_status(f"ℹ️ <b>BOCM revisado ({datetime.now().strftime('%d/%m/%Y')}):</b> No hay oposiciones para A2 Gestión hoy (o ya te avisé antes).")
 
 if __name__ == '__main__':
     print(f"🚀 Iniciando monitorización del BOCM (Máx. reintentos: {MAX_RETRIES}, Espera: {RETRY_DELAY // 60} min)")
