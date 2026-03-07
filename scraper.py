@@ -81,7 +81,7 @@ def send_telegram_alert(title, item_link, bulletin_url):
         'chat_id': TELEGRAM_CHAT_ID,
         'text': message,
         'parse_mode': 'HTML',
-        'disable_web_page_preview': False
+        'link_preview_options': {'is_disabled': False}
     }
     
     try:
@@ -101,7 +101,7 @@ def send_telegram_status(message_text):
         'chat_id': TELEGRAM_CHAT_ID,
         'text': message_text,
         'parse_mode': 'HTML',
-        'disable_web_page_preview': True
+        'link_preview_options': {'is_disabled': True}
     }
     try:
         requests.post(url, json=payload, timeout=10)
