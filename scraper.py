@@ -46,10 +46,9 @@ def is_target_disposition(title):
     """Aplica las reglas de negocio, devolviendo True si pasa todos los filtros."""
     title_norm = normalize_text(title)
     
-    if 'A2' not in title_norm:
-        return False
-        
-    if 'GESTION' not in title_norm:
+    # Si no tiene al menos una de estas 3, lo descartamos
+    target_roles = ['A2', 'GESTION', 'COMUNICACION']
+    if not any(role in title_norm for role in target_roles):
         return False
         
     inclusives = ['CONVOCATORIA', 'BASES', 'PLAZAS', 'PROCESO SELECTIVO']
